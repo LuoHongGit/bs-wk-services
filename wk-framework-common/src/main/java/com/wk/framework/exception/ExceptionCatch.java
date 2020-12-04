@@ -24,6 +24,7 @@ public class ExceptionCatch {
 
     static {
         builder.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
+        EXCEPTIONS = builder.build();
     }
 
     //捕获 CustomException异常
@@ -41,11 +42,6 @@ public class ExceptionCatch {
     @ResponseBody
     public ResponseResult exception(Exception e) {
         LOGGER.error("catch exception : {}\r\nexception: ", e.getMessage(), e);
-
-        //判断已知异常集合是否初始化
-        if (EXCEPTIONS == null) {
-            EXCEPTIONS = builder.build();
-        }
 
         //判断是否是已知异常
         ResultCode resultCode = EXCEPTIONS.get(e.getClass());

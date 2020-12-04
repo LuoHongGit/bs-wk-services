@@ -20,6 +20,7 @@
         <module>../wk-framework-utils</module>
         <module>../wk-service-api</module>
         <module>../wk-service-manage-cms</module>
+        <module>../freemarker-test</module>
     </modules>
 
     <properties>

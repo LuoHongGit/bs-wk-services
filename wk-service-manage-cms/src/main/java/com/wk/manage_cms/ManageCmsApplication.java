@@ -14,7 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
  **/
 @SpringBootApplication
 @EntityScan("com.wk.framework.domain.cms")
-@ComponentScan(basePackages = {"com.wk.api"})
+@ComponentScan(basePackages = "com.wk.api")
+@ComponentScan(basePackages = "com.wk.framework")
 @ComponentScan(basePackages = "com.wk.manage_cms")
 public class ManageCmsApplication {
 

@@ -10,10 +10,10 @@ import com.wk.framework.model.response.CommonCode;
 import com.wk.framework.model.response.QueryResponseResult;
 import com.wk.framework.model.response.QueryResult;
 import com.wk.framework.model.response.ResponseResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import com.wk.manage_cms.service.CmsPageService;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 
 /**
@@ -24,49 +24,63 @@ import java.util.ArrayList;
  * @Version 1.0
  **/
 @RestController
+@RequestMapping("/cms/page")
 public class CmsPageController implements CmsPageControllerApi {
 
+    @Resource
+    private CmsPageService cmsPageService;
+
+    /**
+     * 按条件分页查询页面
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/list/{page}/{size}")
-    public QueryResponseResult list(@PathVariable("page") int page,@PathVariable("size") int size, QueryPageRequest request){
-
-        CmsPage cmsPage = new CmsPage();
-        cmsPage.setPageName("测试页面");
-        ArrayList<CmsPage> list = new ArrayList<>();
-        list.add(cmsPage);
-        QueryResult<CmsPage> queryResult = new QueryResult<>();
-
-        queryResult.setList(list);
-        queryResult.setTotal(1);
-
-        QueryResponseResult<Object> result = new QueryResponseResult<>(CommonCode.SUCCESS, queryResult);
-
-        return result;
+    public QueryResponseResult<CmsPage> findList(@PathVariable("page") int page, @PathVariable("size") int size, QueryPageRequest request) {
+        return cmsPageService.findList(page,size,request);
     }
 
-
-    @Override
-    public QueryResponseResult<CourseBase> findList(int page, int size, QueryPageRequest request) {
-        return null;
+    /**
+     * 添加页面
+     * @param cmsPage
+     * @return
+     */
+    @PostMapping("/add")
+    public CmsPageResult addPage(@RequestBody CmsPage cmsPage) {
+        return cmsPageService.addPage(cmsPage);
     }
 
-    @Override
-    public CmsPageResult addPage(CmsPage cmsPage) {
-        return null;
+    /**
+     * 通过id查询页面
+     * @param id
+     * @return
+     */
+    @GetMapping("/get/{id}")
+    public CmsPage findById(@PathVariable("id") String id) {
+        return cmsPageService.findById(id);
     }
 
-    @Override
-    public CmsPage findById(String id) {
-        return null;
+    /**
+     * 编辑页面
+     * @param id
+     * @param cmsPage
+     * @return
+     */
+    @PutMapping("/edit/{id}")
+    public CmsPageResult editPage(@PathVariable("id") String id, @RequestBody CmsPage cmsPage) {
+        return cmsPageService.editPage(id,cmsPage);
     }
 
-    @Override
-    public CmsPageResult editPage(String id, CmsPage cmsPage) {
-        return null;
-    }
-
-    @Override
-    public ResponseResult delPage(String id) {
-        return null;
+    /**
+     * 删除页面
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/del/{id}")
+    public ResponseResult delPage(@PathVariable("id") String id) {
+        return cmsPageService.delPage(id);
     }
 
     @Override

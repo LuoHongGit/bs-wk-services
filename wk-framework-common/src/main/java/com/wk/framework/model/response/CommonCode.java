@@ -2,13 +2,6 @@ package com.wk.framework.model.response;
 
 import lombok.ToString;
 
-/**
- * @Author: mrt.
- * @Description:
- * @Date:Created in 2018/1/24 18:33.
- * @Modified By:
- */
-
 @ToString
 public enum CommonCode implements ResultCode{
 
@@ -19,7 +12,7 @@ public enum CommonCode implements ResultCode{
     SERVER_ERROR(false,99999,"抱歉，系统繁忙，请稍后重试！"),
     INVALID_PARAM(false,10003,"非法参数！");
 
-//    private static ImmutableMap<Integer, CommonCode> codes ;
+    //private static ImmutableMap<Integer, CommonCode> codes ;
     //操作是否成功
     boolean success;
     //操作代码
@@ -36,6 +29,7 @@ public enum CommonCode implements ResultCode{
     public boolean success() {
         return success;
     }
+
     @Override
     public int code() {
         return code;
