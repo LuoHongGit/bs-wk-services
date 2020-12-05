@@ -1,6 +1,11 @@
 package com.wk.manage_cms.service;
 
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSDownloadStream;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import com.wk.framework.domain.cms.CmsConfig;
 import com.wk.framework.domain.cms.CmsPage;
+import com.wk.framework.domain.cms.CmsTemplate;
 import com.wk.framework.domain.cms.request.QueryPageRequest;
 import com.wk.framework.domain.cms.response.CmsCode;
 import com.wk.framework.domain.cms.response.CmsPageResult;
@@ -10,14 +15,30 @@ import com.wk.framework.model.response.CommonCode;
 import com.wk.framework.model.response.QueryResponseResult;
 import com.wk.framework.model.response.QueryResult;
 import com.wk.framework.model.response.ResponseResult;
+import com.wk.manage_cms.dao.CmsConfigRepository;
 import com.wk.manage_cms.dao.CmsPageRepository;
+import com.wk.manage_cms.dao.CmsTemplateRepository;
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import jdk.nashorn.internal.ir.IfNode;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,6 +53,161 @@ public class CmsPageService {
 
     @Resource
     private CmsPageRepository cmsPageRepository;
+
+    @Resource
+    private CmsConfigRepository cmsConfigRepository;
+
+    @Resource
+    private CmsTemplateRepository cmsTemplateRepository;
+
+    @Resource
+    private CmsConfigService cmsConfigService;
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Resource
+    private GridFSBucket gridFSBucket;
+
+    @Resource
+    private GridFsTemplate gridFsTemplate;
+
+    /**
+     * 通过pageid生成预览页面
+     * @param pageId
+     * @return
+     */
+    public String getHtmlPageById(String pageId) {
+        //获取模型数据
+        Map model = this.getModelById(pageId);
+
+        //判空
+        if (model == null) {
+            ExceptionCast.cast(CmsCode.CMS_GENERATEHTML_DATAISNULL);
+        }
+
+        //获取模板内容
+        String templateStr = this.getTemplateStrByPageId(pageId);
+
+        //执行静态化
+        String content = this.generateHtml(templateStr, model);
+
+        if (StringUtils.isEmpty(content)) {
+            ExceptionCast.cast(CmsCode.CMS_GENERATEHTML_HTMLISNULL);
+        }
+
+        return content;
+    }
+
+    /**
+     * 使用模板和数据模型生成静态页面字符串
+     * @param templateStr
+     * @param model
+     * @return
+     */
+    private String generateHtml(String templateStr, Map model) {
+        try {
+            //创建配置对象
+            Configuration cfg = new Configuration(Configuration.getVersion());
+
+            //创建模板加载器
+            StringTemplateLoader templateLoader = new StringTemplateLoader();
+
+            //设置模板
+            templateLoader.putTemplate("template", templateStr);
+
+            //加载器添加到配置中
+            cfg.setTemplateLoader(templateLoader);
+
+            //获取模板
+            Template template = cfg.getTemplate("template", "utf-8");
+
+            //生成静态内容
+            String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+
+            return content;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * 通过pageid获取模型内容
+     * @param pageId
+     * @return
+     */
+    private Map getModelById(String pageId) {
+        //通过id获取cmspage对象
+        CmsPage cmsPage = this.findById(pageId);
+
+        //判空
+        if (cmsPage == null) {
+            ExceptionCast.cast(CmsCode.CMS_PAGE_NOTEXISTS);
+        }
+
+        //获取dataUrl
+        String dataUrl = cmsPage.getDataUrl();
+
+        //判空
+        if (StringUtils.isEmpty(dataUrl)) {
+            ExceptionCast.cast(CmsCode.CMS_GENERATEHTML_DATAURLISNULL);
+        }
+
+        //请求数据url获取结果
+        ResponseEntity<Map> entity = restTemplate.getForEntity(dataUrl, Map.class);
+
+        return entity.getBody();
+    }
+
+    /**
+     * 通过pageId获取模板字符串
+     * @return
+     */
+    private String getTemplateStrByPageId(String pageId) {
+        //通过id获取cmspage对象
+        CmsPage cmsPage = this.findById(pageId);
+
+        //判空
+        if (cmsPage == null) {
+            ExceptionCast.cast(CmsCode.CMS_PAGE_NOTEXISTS);
+        }
+
+        //获取templateId
+        String templateId = cmsPage.getTemplateId();
+
+        //判空
+        if (StringUtils.isEmpty(templateId)) {
+            ExceptionCast.cast(CmsCode.CMS_GENERATEHTML_TEMPLATEISNULL);
+        }
+
+        //通过模板id获取模板
+        Optional<CmsTemplate> opt = cmsTemplateRepository.findById(templateId);
+
+        //判空
+        if (opt.isPresent()) {
+            CmsTemplate cmsTemplate = opt.get();
+            String templateFileId = cmsTemplate.getTemplateFileId();
+
+            //取出模板文件内容
+            GridFSFile gridFSFile =
+                    gridFsTemplate.findOne(Query.query(Criteria.where("_id").is(templateFileId)));
+            //打开下载流对象
+            GridFSDownloadStream gridFSDownloadStream =
+                    gridFSBucket.openDownloadStream(gridFSFile.getObjectId());
+            //创建GridFsResource
+            GridFsResource gridFsResource = new GridFsResource(gridFSFile, gridFSDownloadStream);
+            try {
+                String content = IOUtils.toString(gridFsResource.getInputStream(), "utf-8");
+                return content;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
 
     /**
      * 按条件分页查询页面
