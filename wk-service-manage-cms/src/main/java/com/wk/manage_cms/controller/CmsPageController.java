@@ -31,6 +31,16 @@ public class CmsPageController implements CmsPageControllerApi {
     private CmsPageService cmsPageService;
 
     /**
+     * 页面发布
+     * @param id
+     * @return
+     */
+    @PostMapping("/postPage/{id}")
+    public ResponseResult postPage(@PathVariable("id") String id) {
+        return cmsPageService.postPage(id);
+    }
+
+    /**
      * 按条件分页查询页面
      * @param page
      * @param size
@@ -83,10 +93,6 @@ public class CmsPageController implements CmsPageControllerApi {
         return cmsPageService.delPage(id);
     }
 
-    @Override
-    public ResponseResult postPage(String id) {
-        return null;
-    }
 
     @Override
     public CmsPageResult save(CmsPage cmsPage) {

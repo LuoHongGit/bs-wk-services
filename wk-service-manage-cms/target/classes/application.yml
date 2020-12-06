@@ -3,6 +3,12 @@ server:
 spring:
   application:
     name: wk-service-manage-cms
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
   data:
     mongodb:
       uri: mongodb://root:123@localhost:27017
