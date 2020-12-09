@@ -1,0 +1,22 @@
+server:
+  port: 50101
+spring:
+  application:
+    name: wk-govern-center
+eureka:
+  # 客户端配置
+  client:
+    register-with-eureka: false # 是否注册自己的信息到EurekaServer，默认是true
+    fetch-registry: false # 是否拉取其它服务的信息，默认是true
+    service-url: # EurekaServer的地址，现在是自己的地址，如果是集群，需要加上其它Server的地址。
+      defaultZone: http://127.0.0.1:${server.port}/eureka
+  # 实例配置
+  instance:
+    prefer-ip-address: true # 当调用getHostname获取实例的hostname时，返回ip而不是host名称
+    ip-address: 127.0.0.1 # 指定自己的ip信息，不指定的话会自己寻找
+    lease-expiration-duration-in-seconds: 90 #服务失效时间，默认值90秒
+    lease-renewal-interval-in-seconds: 30 #服务续约(renew)的间隔，默认为30秒
+  # 服务端配置
+  server:
+    enable-self-preservation: false # 关闭自我保护模式（缺省为打开）
+    eviction-interval-timer-in-ms: 60000 # 扫描失效服务的间隔时间（缺省为60*1000ms）

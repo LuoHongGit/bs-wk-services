@@ -1,0 +1,22 @@
+server:
+  port: 22100
+spring:
+  application:
+    name: wk-service-base-filesystem
+  data:
+    mongodb:
+      uri: mongodb://root:123@127.0.0.1:27017
+      database: wk_cms
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0
+      location:
+      max-file-size: 4MB
+      max-request-size: 30MB
+wk:
+  fastdfs:
+    connect_timeout_in_seconds: 5
+    network_timeout_in_seconds: 30
+    charset: UTF-8
+    tracker_servers: 192.168.138.144:22122
