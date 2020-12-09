@@ -1,5 +1,6 @@
 package com.wk.manage_cms.controller;
 
+import com.wk.api.cms.CmsSiteControllerApi;
 import com.wk.framework.domain.cms.CmsConfig;
 import com.wk.framework.domain.cms.CmsSite;
 import com.wk.manage_cms.service.CmsConfigService;
@@ -20,7 +21,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/cms/site")
-public class CmsSiteController {
+public class CmsSiteController implements CmsSiteControllerApi {
 
     @Resource
     private CmsSiteService cmsSiteService;

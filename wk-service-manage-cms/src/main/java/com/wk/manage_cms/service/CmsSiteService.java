@@ -22,4 +22,5 @@ public class CmsSiteService {
     public List<CmsSite> findAll(){
         return cmsSiteRepository.findAll();
     }
+
 }

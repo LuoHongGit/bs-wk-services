@@ -1,7 +1,9 @@
 package com.wk.manage_cms.controller;
 
+import com.wk.api.cms.CmsTemplateControllerApi;
 import com.wk.framework.domain.cms.CmsConfig;
 import com.wk.framework.domain.cms.CmsTemplate;
+import com.wk.manage_cms.dao.CmsTemplateRepository;
 import com.wk.manage_cms.service.CmsConfigService;
 import com.wk.manage_cms.service.CmsTemplateService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +22,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/cms/template")
-public class CmsTemplateController {
+public class CmsTemplateController implements CmsTemplateControllerApi {
 
     @Resource
     private CmsTemplateService cmsTemplateService;

@@ -1,5 +1,6 @@
 package com.wk.manage_cms.controller;
 
+import com.wk.api.cms.CmsPagePreviewControllerApi;
 import com.wk.framework.web.BaseController;
 import com.wk.manage_cms.service.CmsPageService;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * 页面预览控制器
  */
 @Controller
-public class CmsPagePreviewController extends BaseController {
+public class CmsPagePreviewController extends BaseController implements CmsPagePreviewControllerApi {
     @Autowired
     private CmsPageService cmsPageService;
 
