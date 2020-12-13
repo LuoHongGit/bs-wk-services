@@ -24,6 +24,7 @@
         <module>../wk-service-manage-course</module>
         <module>../wk-service-base-filesystem</module>
         <module>../wk-govern-center</module>
+        <module>../wk-service-search</module>
     </modules>
 
     <properties>

@@ -1,5 +1,5 @@
 server:
-  port: 31002
+  port: ${port:31002}
 spring:
   application:
     name: wk‐service‐manage‐cms‐client
@@ -15,5 +15,5 @@ spring:
     virtual-host: /
 wk:
   mq:
-    queue: queue_cms_postpage_01
-    routingKey: 5a751fab6abb5044e0d19ea1
+    queue: ${qu:queue_cms_postpage_01}
+    routingKey: ${rk:5a751fab6abb5044e0d19ea1}

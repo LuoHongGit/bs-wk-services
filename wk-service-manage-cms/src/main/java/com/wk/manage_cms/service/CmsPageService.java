@@ -6,10 +6,12 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.wk.framework.domain.cms.CmsConfig;
 import com.wk.framework.domain.cms.CmsPage;
+import com.wk.framework.domain.cms.CmsSite;
 import com.wk.framework.domain.cms.CmsTemplate;
 import com.wk.framework.domain.cms.request.QueryPageRequest;
 import com.wk.framework.domain.cms.response.CmsCode;
 import com.wk.framework.domain.cms.response.CmsPageResult;
+import com.wk.framework.domain.cms.response.CmsPostPageResult;
 import com.wk.framework.domain.course.CourseBase;
 import com.wk.framework.exception.ExceptionCast;
 import com.wk.framework.model.response.CommonCode;
@@ -19,6 +21,7 @@ import com.wk.framework.model.response.ResponseResult;
 import com.wk.manage_cms.config.RabbitmqConfig;
 import com.wk.manage_cms.dao.CmsConfigRepository;
 import com.wk.manage_cms.dao.CmsPageRepository;
+import com.wk.manage_cms.dao.CmsSiteRepository;
 import com.wk.manage_cms.dao.CmsTemplateRepository;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -36,6 +39,7 @@ import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
@@ -80,6 +84,9 @@ public class CmsPageService {
 
     @Resource
     private RabbitTemplate rabbitTemplate;
+
+    @Resource
+    private CmsSiteRepository cmsSiteRepository;
 
     /**
      * 通过pageid生成预览页面
@@ -441,5 +448,80 @@ public class CmsPageService {
 
         //发送
         this.rabbitTemplate.convertAndSend(RabbitmqConfig.EX_ROUTING_CMS_POSTPAGE, cmsPage.getSiteId(), msg);
+    }
+
+    /**
+     * 保存或者更新页面
+     * @param cmsPage
+     * @return
+     */
+    @Transactional
+    public CmsPageResult saveOrUpdate(CmsPage cmsPage) {
+        //校验页面是否存在，根据页面名称、站点Id、页面webpath查询
+        CmsPage cmsPage1 =
+                cmsPageRepository.findByPageNameAndPageWebPathAndSiteId(cmsPage.getPageName(),
+                        cmsPage.getPageWebPath(),cmsPage.getSiteId());
+        if (cmsPage1 != null) {
+            return this.editPage(cmsPage1.getPageId(), cmsPage);
+        } else {
+            return this.addPage(cmsPage);
+        }
+    }
+
+    /**
+     * 课程一键发布
+     * @param cmsPage
+     * @return
+     */
+    public CmsPostPageResult postPageQuick(CmsPage cmsPage){
+        //新增或者更新cmspage
+        CmsPageResult cmsPageResult = this.saveOrUpdate(cmsPage);
+
+        //判断是否成功
+        if (!cmsPageResult.isSuccess()) {
+            return new CmsPostPageResult(CmsCode.CMS_PAGE_POST_ERROR, null);
+        }
+
+        //获取页面对象
+        CmsPage one = cmsPageResult.getCmsPage();
+        String pageId = one.getPageId();
+
+        //页面发布
+        ResponseResult postResult = this.postPage(pageId);
+
+        //判断是否发布成功
+        if (!postResult.isSuccess()) {
+            return new CmsPostPageResult(CmsCode.CMS_PAGE_POST_ERROR, null);
+        }
+
+        //通过站点id获取站点
+        String siteId = cmsPage.getSiteId();
+
+        CmsSite cmsSite = this.findCmsSiteById(siteId);
+
+        //站点域名
+        String siteDomain = cmsSite.getSiteDomain();
+        //站点web路径
+        String siteWebPath = cmsSite.getSiteWebPath();
+        //页面web路径
+        String pageWebPath = one.getPageWebPath();
+        //页面名称
+        String pageName = one.getPageName();
+        //页面的web访问地址
+        String pageUrl = siteDomain+siteWebPath+pageWebPath+pageName;
+        return new CmsPostPageResult(CommonCode.SUCCESS,pageUrl);
+    }
+
+    /**
+     * 通过id查询站点
+     * @param id
+     * @return
+     */
+    public CmsSite findCmsSiteById(String id){
+        Optional<CmsSite> siteOpt = cmsSiteRepository.findById(id);
+        if (siteOpt.isPresent()) {
+            return siteOpt.get();
+        }
+        return null;
     }
 }

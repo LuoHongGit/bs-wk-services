@@ -27,3 +27,33 @@ course-publish:
   pageWebPath: /course/detail/
   pagePhysicalPath: /course/detail/
   dataUrlPre: http://localhost:31200/course/courseview/
+
+eureka:
+  # 客户端配置
+  client:
+    register-with-eureka: true # 是否注册自己的信息到EurekaServer，默认是true
+    registry-fetch-interval-seconds: 10 # 注册拉取间隔时长
+    fetch-registry: true # 是否拉取其它服务的信息，默认是true
+    service-url: # EurekaServer的地址，现在是自己的地址，如果是集群，需要加上其它Server的地址。
+      defaultZone: http://127.0.0.1:50101/eureka
+  # 实例配置
+  instance:
+    prefer-ip-address: true # 当调用getHostname获取实例的hostname时，返回ip而不是host名称
+    ip-address: 127.0.0.1 # 指定自己的ip信息，不指定的话会自己寻找
+    lease-expiration-duration-in-seconds: 90 #服务失效时间，默认值90秒
+    lease-renewal-interval-in-seconds: 30 #服务续约(renew)的间隔，默认为30秒
+    instance‐id: ${spring.application.name}:${server.port} #指定实例id
+ribbon:
+  MaxAutoRetries: 1 # 对当前实例的重试次数
+  MaxAutoRetriesNextServer: 1 #切换实例的重试次数
+  OkToRetryOnAllOperations: false #对所有操作请求都进行重试，如果是get则可以，如果是post，put等操作没有实现幂等的情况下是很危险的,所以设置为false
+  ConnectTimeout: 5000 #请求连接的超时时间
+  ReadTimeout: 6000 #请求处理的超时时间
+  NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+course-publish:
+  siteId: 5edc893ba6294b51f0faa9cd
+  templateId: 5aec5dd70e661808240ab7a6
+  previewUrl: http://www.wk.com/cms/preview/
+  pageWebPath: /course/detail/
+  pagePhysicalPath: /course/detail/
+  dataUrlPre: http://localhost:31200/course/courseview/

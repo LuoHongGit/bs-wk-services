@@ -17,3 +17,18 @@ spring:
     cache: false
     settings:
       template_update_delay: 0
+eureka:
+  # 客户端配置
+  client:
+    register-with-eureka: true # 是否注册自己的信息到EurekaServer，默认是true
+    registry-fetch-interval-seconds: 10 # 注册拉取间隔时长
+    fetch-registry: true # 是否拉取其它服务的信息，默认是true
+    service-url: # EurekaServer的地址，现在是自己的地址，如果是集群，需要加上其它Server的地址。
+      defaultZone: http://127.0.0.1:50101/eureka
+  # 实例配置
+  instance:
+    prefer-ip-address: true # 当调用getHostname获取实例的hostname时，返回ip而不是host名称
+    ip-address: 127.0.0.1 # 指定自己的ip信息，不指定的话会自己寻找
+    lease-expiration-duration-in-seconds: 90 #服务失效时间，默认值90秒
+    lease-renewal-interval-in-seconds: 30 #服务续约(renew)的间隔，默认为30秒
+    instance‐id: ${spring.application.name}:${server.port} #指定实例id

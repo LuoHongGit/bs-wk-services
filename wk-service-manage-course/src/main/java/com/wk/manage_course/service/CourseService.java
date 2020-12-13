@@ -61,8 +61,8 @@ public class CourseService {
     @Autowired
     private CoursePicRepository coursePicRepository;
 
-    //@Autowired
-    //private CmsPageClient cmsPageClient;
+    @Autowired
+    private CmsPageClient cmsPageClient;
 
     @Autowired
     private CoursePubRepository coursePubRepository;
@@ -93,7 +93,6 @@ public class CourseService {
 
     /**
      * 添加课程计划
-     *
      * @param teachplan
      * @return
      */
@@ -415,7 +414,7 @@ public class CourseService {
      * @param id
      * @return
      */
-    /*public CoursePublishResult preview(String id){
+    public CoursePublishResult preview(String id){
         //通过id查询课程
         CourseBase one = this.findCourseBaseById(id);
         //发布课程预览页面
@@ -448,11 +447,11 @@ public class CourseService {
         //页面url
         String pageUrl = previewUrl+pageId;
         return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
-    }*/
+    }
 
     //课程发布
     @Transactional
-    /*public CoursePublishResult publish(String courseId){
+    public CoursePublishResult publish(String courseId){
         //课程信息
         CourseBase one = this.findCourseBaseById(courseId);
         //发布课程详情页面
@@ -479,7 +478,7 @@ public class CourseService {
         //页面url
         String pageUrl = cmsPostPageResult.getPageUrl();
         return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
-    }*/
+    }
 
     //创建coursePub对象
     private CoursePub createCoursePub(String id){
@@ -558,7 +557,7 @@ public class CourseService {
     }
 
     //发布课程正式页面
-    /*public CmsPostPageResult publish_page(String courseId){
+    public CmsPostPageResult publish_page(String courseId){
         CourseBase one = this.findCourseBaseById(courseId);
         //发布课程预览页面
         CmsPage cmsPage = new CmsPage();
@@ -579,5 +578,5 @@ public class CourseService {
         //发布页面
         CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
         return cmsPostPageResult;
-    }*/
+    }
 }

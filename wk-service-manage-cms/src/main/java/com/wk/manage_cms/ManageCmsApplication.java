@@ -3,6 +3,7 @@ package com.wk.manage_cms;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @Date 2020/11/27 16:34
  * @Version 1.0
  **/
+@EnableDiscoveryClient
 @SpringBootApplication
 @EntityScan("com.wk.framework.domain.cms")
 @ComponentScan(basePackages = "com.wk.api")

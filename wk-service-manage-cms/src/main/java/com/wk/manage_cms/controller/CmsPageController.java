@@ -93,14 +93,18 @@ public class CmsPageController implements CmsPageControllerApi {
         return cmsPageService.delPage(id);
     }
 
-
-    @Override
-    public CmsPageResult save(CmsPage cmsPage) {
-        return null;
+    /**
+     * 保存或者更新页面
+     * @param cmsPage
+     * @return
+     */
+    @PostMapping("/save")
+    public CmsPageResult save(@RequestBody CmsPage cmsPage) {
+        return cmsPageService.saveOrUpdate(cmsPage);
     }
 
-    @Override
-    public CmsPostPageResult postPageQuick(CmsPage cmsPage) {
-        return null;
+    @PostMapping("/postPageQuick")
+    public CmsPostPageResult postPageQuick(@RequestBody CmsPage cmsPage) {
+        return cmsPageService.postPageQuick(cmsPage);
     }
 }

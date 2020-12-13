@@ -72,8 +72,7 @@ public class CourseController implements CourseControllerApi {
      */
     @PostMapping("/publish/{id}")
     public CoursePublishResult publish(@PathVariable String id) {
-        //return courseService.publish(id);
-        return null;
+        return courseService.publish(id);
     }
 
     /**
@@ -135,25 +134,46 @@ public class CourseController implements CourseControllerApi {
         return courseService.addCoursePic(courseId, pic);
     }
 
+    /**
+     * 通过id查询课程图片
+     * @param courseId
+     * @return
+     */
     @GetMapping("/coursepic/list/{courseId}")
     public CoursePic findCoursePicById(@PathVariable("courseId")String courseId) {
         return courseService.findCoursePicById(courseId);
     }
 
+    /**
+     * 删除课程图片
+     * @param courseId
+     * @return
+     */
     @DeleteMapping("/coursepic/delete")
     public ResponseResult deleteCoursePicById(@RequestParam("courseId") String courseId) {
         return courseService.deleteCoursePicById(courseId);
     }
 
+    /**
+     * 通过id获取courseview对象
+     * @param id
+     * @return
+     */
     @GetMapping("/courseview/{id}")
     public CourseView courseview(@PathVariable("id") String id) {
         return courseService.getCoruseView(id);
     }
 
+    /**
+     * 课程预览
+     * @param id
+     * @return
+     */
     @PostMapping("/preview/{id}")
     public CoursePublishResult coursePreview(@PathVariable("id")String id) {
-        //return courseService.preview(id);
-        return null;
+        return courseService.preview(id);
     }
+
+
 
 }
