@@ -1,21 +1,29 @@
 package com.wk.manage_media.service;
 
+import com.alibaba.fastjson.JSON;
 import com.wk.framework.domain.media.MediaFile;
 import com.wk.framework.domain.media.response.CheckChunkResult;
 import com.wk.framework.domain.media.response.MediaCode;
 import com.wk.framework.exception.ExceptionCast;
 import com.wk.framework.model.response.CommonCode;
 import com.wk.framework.model.response.ResponseResult;
+import com.wk.manage_media.conf.RabbitMQConfig;
 import com.wk.manage_media.dao.MediaFileRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.util.*;
+
+import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 
 /**
  * 媒体资源上传业务层
@@ -23,11 +31,17 @@ import java.util.*;
 
 @Service
 public class MediaUploadService {
-    @Autowired
+    @Resource
     MediaFileRepository mediaFileRepository;
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     @Value("${wk-service-manage-media.upload-location}")
     String upload_location;
+
+    @Value("${wk-service-manage-media.mq.routingkey-media-video}")
+    String routingkey_media_video;
 
     //得到文件所属目录路径
     private String getFileFolderPath(String fileMd5){
@@ -185,7 +199,7 @@ public class MediaUploadService {
         mediaFile.setFileStatus("301002");
         mediaFileRepository.save(mediaFile);
 
-        return new ResponseResult(CommonCode.SUCCESS);
+        return sendProcessVideoMsg(fileMd5);
     }
 
     //校验文件
@@ -247,5 +261,26 @@ public class MediaUploadService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    //向MQ发送视频处理消息
+    public ResponseResult sendProcessVideoMsg(String fileMd5){
+        Optional<MediaFile> optional = mediaFileRepository.findById(fileMd5);
+        if(!optional.isPresent()){
+            return new ResponseResult(CommonCode.FAIL);
+        }
+        MediaFile mediaFile = optional.get();
+        //发送视频处理消息
+        Map<String,String> msgMap = new HashMap<>();
+        msgMap.put("mediaId",fileMd5);
+        //发送的消息
+        String msg = JSON.toJSONString(msgMap);
+        try {
+            this.rabbitTemplate.convertAndSend(RabbitMQConfig.EX_MEDIA_PROCESSTASK,routingkey_media_video,msg);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseResult(CommonCode.FAIL);
+        }
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 }

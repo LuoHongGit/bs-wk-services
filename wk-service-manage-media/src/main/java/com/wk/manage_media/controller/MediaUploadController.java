@@ -41,4 +41,5 @@ public class MediaUploadController implements MediaUploadControllerApi {
     public ResponseResult mergechunks(String fileMd5, String fileName, Long fileSize, String mimetype, String fileExt) {
         return mediaUploadService.mergechunks(fileMd5,fileName,fileSize, mimetype,fileExt);
     }
+
 }

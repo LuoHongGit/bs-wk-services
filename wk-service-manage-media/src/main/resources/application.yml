@@ -8,7 +8,11 @@ spring:
       uri:  mongodb://root:123@localhost:27017
       database: wk_media
 wk-service-manage-media:
+  mq:
+    queue-media-video-processor: queue_media_video_processor
+    routingkey-media-video: routingkey_media_video
   upload-location: E:/bs-wk-code/wk-ui/wk-video/
+  ffmpeg-path: D:/JavaTools/ffmpeg/bin/ffmpeg.exe
 eureka:
   client:
     registerWithEureka: true #服务注册开关
