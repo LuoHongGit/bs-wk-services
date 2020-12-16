@@ -25,6 +25,11 @@
         <module>../wk-service-base-filesystem</module>
         <module>../wk-govern-center</module>
         <module>../wk-service-search</module>
+        <module>../wk-service-manage-media</module>
+        <module>../wk-service-manage-media</module>
+        <module>../wk-service-manage-media</module>
+        <module>../wk-service-manage-media</module>
+        <module>../wk-service-manage-media-processor</module>
     </modules>
 
     <properties>
