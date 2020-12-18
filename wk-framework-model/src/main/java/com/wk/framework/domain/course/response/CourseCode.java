@@ -19,7 +19,9 @@ public enum CourseCode implements ResultCode {
     COURSE_MEDIS_URLISNULL(false,31101,"选择的媒资文件访问地址为空！"),
     COURSE_MEDIS_NAMEISNULL(false,31102,"选择的媒资文件名称为空！"),
     COURSE_PARAM_INVALID(false,31103,"课程参数无效！"),
-    COURSE_PUBLISH_CREATE_INDEX_ERROR(false,31104,"课程发布对象保存失败！");
+    COURSE_PUBLISH_CREATE_INDEX_ERROR(false,31104,"课程发布对象保存失败！"),
+    COURSE_MEDIS_TEACHPLANISNULL(false,31105,"该课程计划不存在！"),
+    COURSE_TEACHPLAN_GRADEERROR(false,31006,"不能选择非三级课程计划节点");
 
     //操作代码
     @ApiModelProperty(value = "操作是否成功", example = "true", required = true)

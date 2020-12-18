@@ -1,10 +1,7 @@
 package com.wk.manage_course.controller;
 
 import com.wk.api.course.CourseControllerApi;
-import com.wk.framework.domain.course.CourseBase;
-import com.wk.framework.domain.course.CourseMarket;
-import com.wk.framework.domain.course.CoursePic;
-import com.wk.framework.domain.course.Teachplan;
+import com.wk.framework.domain.course.*;
 import com.wk.framework.domain.course.ext.CourseInfo;
 import com.wk.framework.domain.course.ext.TeachplanNode;
 import com.wk.framework.domain.course.request.CourseListRequest;
@@ -24,6 +21,16 @@ import org.springframework.web.bind.annotation.*;
 public class CourseController implements CourseControllerApi {
     @Autowired
     private CourseService courseService;
+
+    /**
+     * 保存课程计划和媒体资源信息
+     * @param teachplanMedia
+     * @return
+     */
+    @PostMapping("/savemedia")
+    public ResponseResult savemedia(@RequestBody TeachplanMedia teachplanMedia) {
+        return courseService.savemedia(teachplanMedia);
+    }
 
     /**
      * 查询课程计划
@@ -74,6 +81,7 @@ public class CourseController implements CourseControllerApi {
     public CoursePublishResult publish(@PathVariable String id) {
         return courseService.publish(id);
     }
+
 
     /**
      * 通过id查询课程基本信息
@@ -173,7 +181,5 @@ public class CourseController implements CourseControllerApi {
     public CoursePublishResult coursePreview(@PathVariable("id")String id) {
         return courseService.preview(id);
     }
-
-
 
 }

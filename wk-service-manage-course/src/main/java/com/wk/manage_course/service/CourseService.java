@@ -7,7 +7,6 @@ import com.wk.framework.domain.cms.CmsPage;
 import com.wk.framework.domain.cms.response.CmsPageResult;
 import com.wk.framework.domain.cms.response.CmsPostPageResult;
 import com.wk.framework.domain.course.*;
-import com.wk.framework.domain.course.ext.CategoryNode;
 import com.wk.framework.domain.course.ext.CourseInfo;
 import com.wk.framework.domain.course.ext.TeachplanNode;
 import com.wk.framework.domain.course.request.CourseListRequest;
@@ -28,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.xml.ws.ServiceMode;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -67,6 +66,12 @@ public class CourseService {
     @Autowired
     private CoursePubRepository coursePubRepository;
 
+    @Autowired
+    private TeachplanMediaRepository teachplanMediaRepository;
+
+    @Autowired
+    private TeachplanMediaPubRepository teachplanMediaPubRepository;
+
     @Value("${course-publish.dataUrlPre}")
     private String publish_dataUrlPre;
     @Value("${course-publish.pagePhysicalPath}")
@@ -79,7 +84,67 @@ public class CourseService {
     private String publish_templateId;
     @Value("${course-publish.previewUrl}")
     private String previewUrl;
-    
+
+    //保存课程计划媒资信息
+    private void saveTeachplanMediaPub(String courseId){
+        //查询课程媒资信息
+        List<TeachplanMedia> teachplanMediaList = teachplanMediaRepository.findByCourseId(courseId);
+        //将课程计划媒资信息存储待索引表
+        teachplanMediaPubRepository.deleteByCourseId(courseId);
+        List<TeachplanMediaPub> teachplanMediaPubList = new ArrayList<>();
+        for(TeachplanMedia teachplanMedia:teachplanMediaList){
+            TeachplanMediaPub teachplanMediaPub =new TeachplanMediaPub();
+            BeanUtils.copyProperties(teachplanMedia,teachplanMediaPub);
+            teachplanMediaPubList.add(teachplanMediaPub);
+        }
+        teachplanMediaPubRepository.saveAll(teachplanMediaPubList);
+    }
+
+    /**
+     * 保存课程计划和媒体资源信息
+     * @param teachplanMedia
+     * @return
+     */
+    public ResponseResult savemedia(TeachplanMedia teachplanMedia) {
+        //参数合法性校验
+        if (teachplanMedia == null) {
+            ExceptionCast.cast(CommonCode.INVALID_PARAM);
+        }
+
+        //查询课程计划是否存在
+        Optional<Teachplan> opt = teachplanRepository.findById(teachplanMedia.getTeachplanId());
+        if (!opt.isPresent()) {
+            ExceptionCast.cast(CourseCode.COURSE_MEDIS_TEACHPLANISNULL);
+        }
+
+        //判断是否是三级节点
+        Teachplan teachplan = opt.get();
+        if (StringUtils.isEmpty(teachplan.getGrade()) || !teachplan.getGrade().equals("3")) {
+            ExceptionCast.cast(CourseCode.COURSE_TEACHPLAN_GRADEERROR);
+        }
+
+        //查询原有TeachplanMedia
+        TeachplanMedia one = null;
+        Optional<TeachplanMedia> tmOpt = teachplanMediaRepository.findById(teachplan.getId());
+        if (tmOpt.isPresent()) {
+            one = tmOpt.get();
+        } else {
+            one = new TeachplanMedia();
+        }
+
+        //属性设置
+        one.setCourseId(teachplanMedia.getCourseId());
+        one.setMediaFileOriginalName(teachplanMedia.getMediaFileOriginalName());
+        one.setMediaId(teachplanMedia.getMediaId());
+        one.setMediaUrl(teachplanMedia.getMediaUrl());
+        one.setTeachplanId(teachplanMedia.getTeachplanId());
+
+        //保存
+        teachplanMediaRepository.save(one);
+
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+
     /**
      * 查询课程计划
      *
@@ -475,6 +540,10 @@ public class CourseService {
 
         //课程索引...
         //课程缓存...
+
+        //保存课程计划媒资信息到待索引表
+        saveTeachplanMediaPub(courseId);
+
         //页面url
         String pageUrl = cmsPostPageResult.getPageUrl();
         return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);

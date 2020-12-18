@@ -1,9 +1,6 @@
 package com.wk.api.course;
 
-import com.wk.framework.domain.course.CourseBase;
-import com.wk.framework.domain.course.CourseMarket;
-import com.wk.framework.domain.course.CoursePic;
-import com.wk.framework.domain.course.Teachplan;
+import com.wk.framework.domain.course.*;
 import com.wk.framework.domain.course.ext.CourseInfo;
 import com.wk.framework.domain.course.ext.TeachplanNode;
 import com.wk.framework.domain.course.request.CourseListRequest;
@@ -103,4 +100,7 @@ public interface CourseControllerApi {
 
     @ApiOperation("发布课程")
     CoursePublishResult publish(@PathVariable String id);
+
+    @ApiOperation("保存媒资信息")
+    public ResponseResult savemedia(TeachplanMedia teachplanMedia);
 }
