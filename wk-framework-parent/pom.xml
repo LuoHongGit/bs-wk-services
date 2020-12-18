@@ -30,6 +30,7 @@
         <module>../wk-service-manage-media</module>
         <module>../wk-service-manage-media</module>
         <module>../wk-service-manage-media-processor</module>
+        <module>../wk-service-learning</module>
     </modules>
 
     <properties>

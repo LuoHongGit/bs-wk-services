@@ -3,12 +3,14 @@ package com.wk.search;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author Administrator
  * @version 1.0
  **/
+@EnableDiscoveryClient
 @SpringBootApplication
 @EntityScan("com.wk.framework.domain.search")//扫描实体类
 @ComponentScan(basePackages={"com.wk.api"})//扫描接口

@@ -54,7 +54,7 @@ public class EsCourseController implements EsCourseControllerApi {
      * @return
      */
     @GetMapping(value="/getmedia/{teachplanId}")
-    public TeachplanMediaPub getmedia(String teachplanId) {
+    public TeachplanMediaPub getmedia(@PathVariable("teachplanId") String teachplanId) {
         //将课程计划id放在数组中，为调用service作准备
         String[] teachplanIds = new String[]{teachplanId};
         //通过service查询ES获取课程媒资信息
