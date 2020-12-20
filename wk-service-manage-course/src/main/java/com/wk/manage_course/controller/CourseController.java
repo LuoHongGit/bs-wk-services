@@ -14,6 +14,7 @@ import com.wk.framework.model.response.QueryResponseResult;
 import com.wk.framework.model.response.ResponseResult;
 import com.wk.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,6 +36,7 @@ public class CourseController implements CourseControllerApi {
     /**
      * 查询课程计划
      */
+    @PreAuthorize("hasAuthority('course_teachplan_list')")
     @GetMapping("/teachplan/list/{courseId}")
     public TeachplanNode findTeachplanList(@PathVariable("courseId") String courseId) {
         return courseService.findTeachplanList(courseId);
@@ -57,6 +59,7 @@ public class CourseController implements CourseControllerApi {
      * @param courseListRequest
      * @return
      */
+    @PreAuthorize("hasAuthority('course_find_list')")
     @GetMapping("/coursebase/list/{page}/{size}")
     public QueryResponseResult<CourseInfo> findCourseListPage(@PathVariable("page") int page,@PathVariable("size") int size, CourseListRequest courseListRequest) {
         return courseService.findCourseListPage(page, size, courseListRequest);
@@ -88,6 +91,7 @@ public class CourseController implements CourseControllerApi {
      * @param courseid
      * @return
      */
+    //@PreAuthorize("hasAuthority('course_get_baseinfo')")
     @GetMapping("/coursebase/findById/{courseid}")
     public CourseBase findCourseBaseById(@PathVariable("courseid") String courseid){
         return courseService.findCourseBaseById(courseid);

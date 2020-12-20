@@ -1,15 +1,19 @@
 package com.wk.ucenter.service;
 
 import com.wk.framework.domain.ucenter.XcCompanyUser;
+import com.wk.framework.domain.ucenter.XcMenu;
 import com.wk.framework.domain.ucenter.XcUser;
 import com.wk.framework.domain.ucenter.ext.XcUserExt;
 import com.wk.ucenter.dao.XcCompanyUserRepository;
+import com.wk.ucenter.dao.XcMenuMapper;
 import com.wk.ucenter.dao.XcUserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用户业务层
@@ -21,6 +25,9 @@ public class UserService {
 
     @Resource
     private XcCompanyUserRepository xcCompanyUserRepository;
+
+    @Resource
+    private XcMenuMapper xcMenuMapper;
 
     //根据用户账号查询用户信息
     public XcUser findXcUserByUsername(String username) {
@@ -43,6 +50,15 @@ public class UserService {
             String companyId = xcCompanyUser.getCompanyId();
             xcUserExt.setCompanyId(companyId);
         }
+        //查询用户权限信息
+        List<XcMenu> xcMenus = xcMenuMapper.selectPermissionByUserId(userId);
+
+        if (xcMenus == null) {
+            xcMenus = new ArrayList<XcMenu>();
+        }
+
+        xcUserExt.setPermissions(xcMenus);
+
         return xcUserExt;
     }
 }

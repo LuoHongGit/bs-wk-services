@@ -33,6 +33,7 @@
         <module>../wk-service-learning</module>
         <module>../wk-service-ucenter-auth</module>
         <module>../wk-service-ucenter</module>
+        <module>../wk-govern-gateway</module>
     </modules>
 
     <properties>
