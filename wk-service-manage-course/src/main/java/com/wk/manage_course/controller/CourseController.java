@@ -11,7 +11,10 @@ import com.wk.framework.domain.course.response.CourseView;
 import com.wk.framework.exception.ExceptionCast;
 import com.wk.framework.model.response.CommonCode;
 import com.wk.framework.model.response.QueryResponseResult;
+import com.wk.framework.model.response.QueryResult;
 import com.wk.framework.model.response.ResponseResult;
+import com.wk.framework.utils.XcOauth2Util;
+import com.wk.framework.web.BaseController;
 import com.wk.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/course")
-public class CourseController implements CourseControllerApi {
+public class CourseController extends BaseController implements CourseControllerApi {
     @Autowired
     private CourseService courseService;
 
@@ -59,10 +62,29 @@ public class CourseController implements CourseControllerApi {
      * @param courseListRequest
      * @return
      */
-    @PreAuthorize("hasAuthority('course_find_list')")
-    @GetMapping("/coursebase/list/{page}/{size}")
+    //@PreAuthorize("hasAuthority('course_find_list')")
+    //@GetMapping("/coursebase/list/{page}/{size}")
     public QueryResponseResult<CourseInfo> findCourseListPage(@PathVariable("page") int page,@PathVariable("size") int size, CourseListRequest courseListRequest) {
         return courseService.findCourseListPage(page, size, courseListRequest);
+    }
+
+    /**
+     * 分页查询课程列表
+     * @param page
+     * @param size
+     * @param courseListRequest
+     * @return
+     */
+    @GetMapping("/coursebase/list/{page}/{size}")
+    public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page")int page,@PathVariable("size") int size, CourseListRequest courseListRequest) {
+        //调用工具类取出用户信息
+        XcOauth2Util xcOauth2Util = new XcOauth2Util();
+        XcOauth2Util.UserJwt userJwt = xcOauth2Util.getUserJwtFromHeader(request);
+        if(userJwt == null){
+            ExceptionCast.cast(CommonCode.UNAUTHENTICATED);
+        }
+        String companyId = userJwt.getCompanyId();
+        return courseService.findCourseList(companyId,page,size,courseListRequest);
     }
 
     /**

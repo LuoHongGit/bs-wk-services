@@ -34,6 +34,7 @@
         <module>../wk-service-ucenter-auth</module>
         <module>../wk-service-ucenter</module>
         <module>../wk-govern-gateway</module>
+        <module>../wk-service-manage-order</module>
     </modules>
 
     <properties>

@@ -8,6 +8,7 @@ import com.wk.framework.domain.course.response.AddCourseResult;
 import com.wk.framework.domain.course.response.CoursePublishResult;
 import com.wk.framework.domain.course.response.CourseView;
 import com.wk.framework.model.response.QueryResponseResult;
+import com.wk.framework.model.response.QueryResult;
 import com.wk.framework.model.response.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -42,6 +43,17 @@ public interface CourseControllerApi {
             @ApiImplicitParam(name="courseListRequest",value = "课程查询条件")
     })
     QueryResponseResult<CourseInfo> findCourseListPage(int page, int size, CourseListRequest courseListRequest);
+
+    /**
+     * 分页查询课程列表（新）
+     * @param page
+     * @param size
+     * @param courseListRequest
+     * @return
+     */
+    public QueryResponseResult<CourseInfo> findCourseList(int page,
+                                                  int size,
+                                                  CourseListRequest courseListRequest);
 
     //新增课程
     @ApiOperation("新增课程")

@@ -85,6 +85,38 @@ public class CourseService {
     @Value("${course-publish.previewUrl}")
     private String previewUrl;
 
+    /**
+     * 分页查询课程列表（新）
+     * @param companyId
+     * @param page
+     * @param size
+     * @param courseListRequest
+     * @return
+     */
+    public QueryResponseResult<CourseInfo> findCourseList(String companyId,int page,int
+            size,CourseListRequest courseListRequest) {
+        if(courseListRequest == null){
+            courseListRequest = new CourseListRequest();
+        }
+        //将companyId传给dao
+        courseListRequest.setCompanyId(companyId);
+        if (page < 1) {
+            page = 1;
+        }
+
+        if (size < 1) {
+            size = 10;
+        }
+        PageHelper.startPage(page, size);
+        Page<CourseInfo> courseListPage = courseMapper.findCourseList(courseListRequest);
+        List<CourseInfo> list = courseListPage.getResult();
+        long total = courseListPage.getTotal();
+        QueryResult<CourseInfo> courseIncfoQueryResult = new QueryResult<CourseInfo>();
+        courseIncfoQueryResult.setList(list);
+        courseIncfoQueryResult.setTotal(total);
+        return new QueryResponseResult<CourseInfo>(CommonCode.SUCCESS,courseIncfoQueryResult);
+    }
+
     //保存课程计划媒资信息
     private void saveTeachplanMediaPub(String courseId){
         //查询课程媒资信息

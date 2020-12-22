@@ -16,4 +16,7 @@ public interface CourseMapper {
 
    //查询所有课程
    Page<CourseInfo> findCourseListPage(CourseListRequest courseListRequest);
+
+   //查询所有课程
+   Page<CourseInfo> findCourseList(CourseListRequest courseListRequest);
 }
